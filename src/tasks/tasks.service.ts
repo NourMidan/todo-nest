@@ -39,4 +39,17 @@ export class TasksService {
       return { message: 'updated' };
     }
   }
+  async delete(id: number, user: User) {
+    const task = await this.taskRepository.findOne({
+      where: { id },
+      relations: { user: true },
+    });
+    if (!task) throw new NotFoundException('Task not found');
+    if (task.user.id !== user.id) {
+      throw new UnauthorizedException('unauthorized');
+    } else {
+      await this.taskRepository.delete(id);
+      return { message: 'deleted' };
+    }
+  }
 }
